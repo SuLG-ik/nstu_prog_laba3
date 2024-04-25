@@ -16,4 +16,6 @@ void assert_greater_than_n(int value, int n, const std::string &label);
 
 void assert_course_in(int value, int left, int right, const std::string &label);
 
+void assert_number(const std::string& value, const std::string& label);
+
 void assert_true(bool value, const std::string &label);

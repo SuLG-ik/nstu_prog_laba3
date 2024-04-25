@@ -5,7 +5,6 @@
 #include "Smartphone.h"
 #include "Validator.h"
 #include "Assert.h"
-#include <stdexcept>
 
 std::string &Smartphone::getVendor() {
     return vendor;

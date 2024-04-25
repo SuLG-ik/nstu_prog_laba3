@@ -39,6 +39,15 @@ void assert_course_in(int value, int left, int right, const std::string &label) 
     }
 }
 
+
+void assert_number(const std::string &value, const std::string &label) {
+    for (const auto &item: value) {
+        if (!isdigit(item))
+            throw std::invalid_argument(
+                    label + " (" + value + ")" + " is not a number");
+    }
+}
+
 void assert_true(bool value, const std::string &label) {
     if (!value) {
         throw std::logic_error(label + "must be true");

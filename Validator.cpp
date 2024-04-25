@@ -6,11 +6,11 @@
 #include "Assert.h"
 
 void validateVendor(const std::string &vendor) {
-    assert_not_empty(vendor, "Vendor");
+    assert_course_in(vendor.size(), 1, 30, "Vendor length");
 }
 
 void validateModel(const std::string &model) {
-    assert_not_empty(model, "Model");
+    assert_course_in(model.size(), 1, 30, "Model length");
 }
 
 void validateRamType(const std::string &ramType) {
@@ -18,6 +18,7 @@ void validateRamType(const std::string &ramType) {
 }
 
 void validateImei(const std::string &imei) {
+    assert_number(imei, "IMEI");
     assert_course_in(imei.size(), 14, 15, "IMEI size");
 }
 
