@@ -45,6 +45,10 @@ public:
 
     void setOSName(std::string osName);
 
+    /**
+     * Calculate average count of applications available for install
+     * @return average count of applications available for install
+     */
     int getAvailableApplicationsCountForInstall();
 
 private:
@@ -74,5 +78,8 @@ public:
 
     void log(std::ostream &stream);
 
+    /**
+     * Validate all fields and set @Smartphone as initialized
+     */
     void validate();
 };
