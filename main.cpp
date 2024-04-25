@@ -4,7 +4,7 @@
 std::string stringInputWithLabel(const std::string &label) {
     std::string result;
     std::cout << "Text " << label << ": ";
-    std::cin >> result;
+    std::getline(std::cin, result);
     return result;
 }
 
@@ -12,7 +12,7 @@ int intInputWithLabel(const std::string &label) {
     std::string value;
     do {
         std::cout << "Text " << label << ": ";
-        std::cin >> value;
+        std::getline(std::cin, value);
         try {
             int iValue = std::stoi(value);
             return iValue;
