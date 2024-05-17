@@ -6,57 +6,52 @@
 #include "Validator.h"
 #include "Assert.h"
 
-std::string &Smartphone::getVendor() {
+std::string Smartphone::getVendor() const {
     return vendor;
 }
 
-std::string &Smartphone::getModel() {
+std::string Smartphone::getModel() const {
     return model;
 }
 
-std::string &Smartphone::getRamType() {
+std::string Smartphone::getRamType() const {
     return ramType;
 }
 
-std::string &Smartphone::getImei() {
+std::string Smartphone::getImei() const {
     return imei;
 }
 
-std::string &Smartphone::getOsName() {
+std::string Smartphone::getOsName() const {
     return osName;
 }
 
-int Smartphone::getCpuFrequency() {
+int Smartphone::getCpuFrequency() const {
     return cpuFrequency;
 }
 
-int Smartphone::getCpuCoresCount() {
+int Smartphone::getCpuCoresCount() const {
     return cpuCoresCount;
 }
 
-int Smartphone::getRamSize() {
+int Smartphone::getRamSize() const {
     return ramSize;
 }
 
-int Smartphone::getRomSize() {
+int Smartphone::getRomSize() const {
     return romSize;
 }
 
-int Smartphone::getInstalledApplicationsCount() {
-    return installedApplicationsCount;
+int Smartphone::getInstalledApplicationsCount() const {
+    return installedApplications.size();
 }
 
-int Smartphone::getRomInUseSize() {
-    return romInUsageSize;
-}
-
-void Smartphone::installApplications(int count, int usageSize) {
-    assert_true(isInitialized, "Initialized");
-    validateInstalledApplications(count, usageSize, romSize, romInUsageSize);
-    count = Smartphone::installedApplicationsCount + count;
-    usageSize = Smartphone::romInUsageSize + usageSize;
-    Smartphone::installedApplicationsCount = count;
-    Smartphone::romInUsageSize = usageSize;
+int Smartphone::getRomInUseSize() const {
+    int sum = 0;
+    for (const auto &item: installedApplications) {
+        sum += item.getSize();
+    }
+    return sum;
 }
 
 void Smartphone::setVendor(const std::string &vendor) {
@@ -111,7 +106,7 @@ void Smartphone::set(const std::string &imei, const std::string &ramType, const 
     setModel(model);
     setVendor(vendor);
     setCpuFrequency(cpuFrequency);
-    setCpuCoresCount(cpuFrequency);
+    setCpuCoresCount(cpuCoresCount);
     setRamSize(ramSize);
     setRomSize(romSize);
 }
@@ -121,33 +116,12 @@ void Smartphone::setOSName(std::string osName) {
     Smartphone::osName = osName;
 }
 
-void Smartphone::log(std::ostream &stream) {
-    stream << std::endl << "——— Smartphone info ———" << std::endl;
-    stream << "valid: " << isInitialized << std::endl;
-    stream << "IMEI: " << getImei() << std::endl;
-    stream << "OS name: " << getOsName() << std::endl;
-    stream << "Vendor: " << getVendor() << std::endl;
-    stream << "Model: " << getModel() << std::endl;
-    stream << "RAM size: " << getRamSize() << " byte" << std::endl;
-    stream << "RAM type: " << getRamType() << std::endl;
-    stream << "ROM size: " << getRomSize() << " byte" << std::endl;
-    stream << "ROM in use size: " << getRomInUseSize() << " byte" << std::endl;
-    stream << "CPU cores count: " << getCpuCoresCount() << std::endl;
-    stream << "CPU frequency: " << getCpuFrequency() << " Hz" << std::endl;
-    stream << "Installed applications count: " << getInstalledApplicationsCount() << std::endl;
-    stream << "Available applications for install: "
-           << (getAvailableApplicationsCountForInstall() == -1 ? "none" :
-               std::to_string(getAvailableApplicationsCountForInstall()))
-           << std::endl << std::endl;
-}
-
 Smartphone::~Smartphone() = default;
 
 Smartphone::Smartphone() = default;
 
 void Smartphone::hardReset() {
-    Smartphone::romInUsageSize = 0;
-    Smartphone::installedApplicationsCount = 0;
+    installedApplications.clear();
 }
 
 void Smartphone::validate() {
@@ -162,10 +136,56 @@ void Smartphone::validate() {
     isInitialized = true;
 }
 
-int Smartphone::getAvailableApplicationsCountForInstall() {
-    if (installedApplicationsCount == 0) {
+int Smartphone::getAvailableApplicationsCountForInstall() const {
+    if (installedApplications.empty())
         return -1;
-    }
-    return (romSize - romInUsageSize) / (romInUsageSize / installedApplicationsCount);
+    int romInUseSize = getRomInUseSize();
+    return (romSize - romInUseSize) / (romInUseSize / getInstalledApplicationsCount());
 }
 
+void Smartphone::installApplication(Application &application) {
+    if (isInstalled(application)) {
+        throw std::invalid_argument("Application already installed");
+    }
+    validateInstalledApplications(getRomInUseSize() + application.getSize(), getRomSize(), getRomInUseSize());
+    installedApplications.push_back(application);
+}
+
+bool Smartphone::isInstalled(Application &application) {
+    for (const auto &item: installedApplications) {
+        if (application == item)
+            return true;
+    }
+    return false;
+}
+
+std::ostream &operator<<(std::ostream &os, const Smartphone &smartphone) {
+    os << std::endl << "——— Smartphone info ———" << std::endl;
+    os << "valid: " << smartphone.isInitialized << std::endl;
+    os << "IMEI: " << smartphone.getImei() << std::endl;
+    os << "OS name: " << smartphone.getOsName() << std::endl;
+    os << "Vendor: " << smartphone.getVendor() << std::endl;
+    os << "Model: " << smartphone.getModel() << std::endl;
+    os << "RAM size: " << smartphone.getRamSize() << " byte" << std::endl;
+    os << "RAM type: " << smartphone.getRamType() << std::endl;
+    os << "ROM size: " << smartphone.getRomSize() << " byte" << std::endl;
+    os << "ROM in use size: " << smartphone.getRomInUseSize() << " byte" << std::endl;
+    os << "CPU cores count: " << smartphone.getCpuCoresCount() << std::endl;
+    os << "CPU frequency: " << smartphone.getCpuFrequency() << " Hz" << std::endl;
+    os << "Installed applications count: " << smartphone.getInstalledApplicationsCount() << std::endl;
+    os << "Available applications for install: "
+       << (smartphone.getAvailableApplicationsCountForInstall() == -1 ? "none" :
+           std::to_string(smartphone.getAvailableApplicationsCountForInstall()))
+       << std::endl << std::endl;
+    os << "Installed applications list:" << std::endl;
+    for (const auto &item: smartphone.installedApplications) {
+        os << item << std::endl;
+    }
+    return os;
+}
+
+void Smartphone::uninstallApplicationByPackageName(const std::string &packageName) {
+    installedApplications.remove_if([&](const auto &item) {
+        return packageName == item.getPackageName();
+    });
+}

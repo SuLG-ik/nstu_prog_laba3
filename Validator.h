@@ -24,4 +24,10 @@ void validateRomSize(int romSize);
 
 void validateOSName(std::string &osName);
 
-void validateInstalledApplications(int count, int usageSize, int totalRomSize, int currentUsageSize) ;
+void validateInstalledApplications(int usageSize, int totalRomSize, int currentUsageSize);
+
+void validateApplicationName(std::string &value);
+
+void validateApplicationPackageName(std::string &value);
+
+void validateApplicationSize(int value);

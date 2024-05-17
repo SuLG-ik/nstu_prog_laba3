@@ -5,6 +5,8 @@
 #pragma once
 
 #include <iostream>
+#include <list>
+#include "Application.h"
 
 #define OS_NAME_NONE "NONE"
 
@@ -17,29 +19,33 @@ public:
     Smartphone(const std::string &imei, const std::string &ramType, const std::string &model, const std::string &vendor,
                int cpuFrequency, int cpuCoresCount, int ramSize, int romSize);
 
-    std::string &getVendor();
+    std::string getVendor() const;
 
-    std::string &getModel();
+    std::string getModel() const;
 
-    std::string &getRamType();
+    std::string getRamType() const;
 
-    std::string &getImei();
+    std::string getImei() const;
 
-    std::string &getOsName();
+    std::string getOsName() const;
 
-    int getCpuFrequency();
+    int getCpuFrequency() const;
 
-    int getCpuCoresCount();
+    int getCpuCoresCount() const;
 
-    int getRamSize();
+    int getRamSize() const;
 
-    int getRomSize();
+    int getRomSize() const;
 
-    int getInstalledApplicationsCount();
+    int getInstalledApplicationsCount() const;
 
-    int getRomInUseSize();
+    void installApplication(Application &application);
 
-    void installApplications(int count, int usageSize);
+    int getRomInUseSize() const;
+
+    void uninstallApplicationByPackageName(const std::string &packageName);
+
+    bool isInstalled(Application &application);
 
     void hardReset();
 
@@ -49,12 +55,13 @@ public:
      * Calculate average count of applications available for install
      * @return average count of applications available for install
      */
-    int getAvailableApplicationsCountForInstall();
+    int getAvailableApplicationsCountForInstall() const;
 
 private:
     std::string vendor, model, ramType, imei, osName = OS_NAME_NONE;
-    int cpuFrequency = 0, cpuCoresCount = 0, ramSize = 0, romSize = 0, installedApplicationsCount = 0, romInUsageSize = 0;
+    int cpuFrequency = 0, cpuCoresCount = 0, ramSize = 0, romSize = 0;
     bool isInitialized = false;
+    std::list<Application> installedApplications;
 
     void set(const std::string &imei, const std::string &ramType, const std::string &model, const std::string &vendor,
              int cpuFrequency, int cpuCoresCount, int ramSize, int romSize);
@@ -76,7 +83,7 @@ public:
 
     void setRomSize(int romSize);
 
-    void log(std::ostream &stream);
+    friend std::ostream &operator<<(std::ostream &os, const Smartphone &smartphone);
 
     /**
      * Validate all fields and set @Smartphone as initialized

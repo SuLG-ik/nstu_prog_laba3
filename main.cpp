@@ -24,6 +24,11 @@ int intInputWithLabel(const std::string &label) {
     } while (true);
 }
 
+bool inputIsContinue() {
+    std::string input = stringInputWithLabel("Continue? (Y/n)");
+    return input == "y" || input == "yes" || input == "Y" || input == "YES";
+}
+
 Smartphone setup() {
     Smartphone smartphone;
     while (true) {
@@ -47,12 +52,41 @@ Smartphone setup() {
     }
 }
 
+Application inputApplication() {
+    std::string name = stringInputWithLabel("Application name");
+    std::string packageName = stringInputWithLabel("Application package name (unique)");
+    int size = intInputWithLabel("Applcation size");
+    return Application(name, packageName, size);
+}
+
 void installApplications(Smartphone &smartphone) {
     while (true) {
         try {
             std::cout << "— Installing applications —" << std::endl;
-            smartphone.installApplications(intInputWithLabel("Count"), intInputWithLabel("size"));
-            break;
+            Application application = inputApplication();
+            smartphone.installApplication(application);
+            if (!inputIsContinue())
+                return;
+        }
+        catch (std::invalid_argument &e) {
+            std::cout << e.what() << std::endl;
+            std::cout << "Error during installing, restart..." << std::endl;
+        }
+    }
+}
+
+void uninstallApplications(Smartphone &smartphone) {
+    std::cout << smartphone;
+    while (true) {
+        try {
+            std::cout << "— Uninstalling applications —" << std::endl;
+            std::string packageName = stringInputWithLabel("Application package name to install");
+            smartphone.uninstallApplicationByPackageName(packageName);
+            std::cout << smartphone;
+            if (!inputIsContinue())
+                return;
+            else
+                std::cout << smartphone;
         }
         catch (std::invalid_argument &e) {
             std::cout << e.what() << std::endl;
@@ -77,17 +111,16 @@ void changeOS(Smartphone &smartphone) {
 
 int main() {
     Smartphone smartphone = setup();
-    smartphone.log(std::cout);
+    std::cout << smartphone;
     changeOS(smartphone);
-    smartphone.log(std::cout);
+    std::cout << smartphone;
     installApplications(smartphone);
-    smartphone.log(std::cout);
-    installApplications(smartphone);
-    smartphone.log(std::cout);
+    std::cout << smartphone;
     std::cout << "Hard reset" << std::endl;
     smartphone.hardReset();
-    smartphone.log(std::cout);
+    std::cout << smartphone;
     installApplications(smartphone);
-    smartphone.log(std::cout);
+    std::cout << smartphone;
+    uninstallApplications(smartphone);
     return 0;
 }

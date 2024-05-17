@@ -10,4 +10,6 @@ add_executable(laba3 main.cpp
         Assert.cpp
         Validator.h
         Validator.cpp
+        Application.cpp
+        Application.h
 )
